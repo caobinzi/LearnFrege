@@ -1,0 +1,29 @@
+module example.Json where
+
+import Data.JSON
+
+data Coordinate = Coordinate { lon :: Float, lat :: Float }
+derive Show Coordinate
+
+data Weather = Weather { loc :: Coordinate
+                       , temp :: Int
+                       , desc :: String
+                       , alert :: Maybe String
+                       }
+derive Show Weather
+
+instance ToJSON Coordinate where
+  toJSON coord = Struct [ ("lon", toJSON coord.lon), ("lat", toJSON coord.lat) ]
+
+
+instance ToJSON Weather where
+  toJSON Weather{loc, temp, desc, alert}
+    = Struct [ ("loc", toJSON loc)
+            , ("temp", toJSON temp)
+            , ("desc", toJSON desc)
+            , ("alert", toJSON $ fromMaybe "null" alert)
+           ]
+
+testJson = show . toJSON $ Weather location 98 "overcast clouds" (Just "Excessive heat")
+  where
+      location = Coordinate { lon = -122.09, lat = 37.39 }
